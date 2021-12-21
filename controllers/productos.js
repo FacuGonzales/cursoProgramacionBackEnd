@@ -1,29 +1,53 @@
 
 const ProductModel = require('../models/productos');
-const ProductosFile = new ProductModel('productos');
+
+const _productos = new ProductModel('productos')
+
+const _listadoProductos = _productos.getAll();
 
 function getById(req, res){
-    console.log('Viewing ' + req.params.id);
+    const {id} = req.params
+
+    _productos.getById(id).then(producto => (producto) ? res.send(producto) : res.send({error: "Producto no encontrado"}));
 }
 
 function getAll(req, res){
-    ProductosFile.getAll().then((data) => res.send(`PRODUCTOS DISPONIBLES:  ${JSON.stringify(data)}`))
-                          .catch((err) => {throw err}); 
+    res.send(_listadoProductos);
 }
 
 function save(req, res){
-    console.log('Todo created')
+    const { title, price, thumbnail } = req.body
+    const producto = { title, price, thumbnail }
+    console.log(producto)
+    _productos.save(producto).then(p => res.send(p))
     
 }
 
 function update(req, res){
-    console.log('Todo ' + req.params.id + ' updated')
+    const { id } = req.params
+
+    if (!_listadoProductos.find(d => d.id == id)) return res.send({error: "Producto no encontrado"});
+      
+      
+    const { title, price, thumbnail } = req.body
+    const producto = { title, price, thumbnail }
+    for (let i = 0; i < _listadoProductos.length; i++) {
+      if(_listadoProductos[i].id == id){
+        _listadoProductos[i].title = producto.title
+        _listadoProductos[i].price = producto.price
+        _listadoProductos[i].thumbnail = producto.thumbnail
+      } 
+    }
+    _productos.save(_listadoProductos).then( res.send("Producto actualizado"))
+  
     
 }
 
 function deleteProduct(req, res){
-    console.log('Todo deleted'+ req.params.id);
-    
+    const {id}= req.params
+    if (!_listadoProductos.find(d => d.id == id)) return res.send({error: "Producto no encontrado"});
+   
+    _productos.deleteById(id).then(res.send("Producto eliminado"))
 }
 
 module.exports = {
