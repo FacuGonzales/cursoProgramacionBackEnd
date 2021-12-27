@@ -1,4 +1,5 @@
 
+const { stringify } = require('nodemon/lib/utils');
 const ProductModel = require('../models/productos');
 
 const _productos = new ProductModel('productos')
@@ -12,14 +13,23 @@ function getById(req, res){
 }
 
 function getAll(req, res){
-    res.send(_listadoProductos);
+    // Render me permite dibujar los resultados el la vista
+    const prods =  _productos.getAll();
+    res.render("vista", {
+        productos: prods,
+        hayProductos: prods.length
+    });
+    // res.send(_listadoProductos);
 }
 
 function save(req, res){
     const { title, price, thumbnail } = req.body
     const producto = { title, price, thumbnail }
     console.log(producto)
-    _productos.save(producto).then(p => res.send(p))
+    // _productos.save(producto).then(p => res.send(p))
+
+    // Con redirect me permite al crear el producto volver al formulario.
+    _productos.save(producto).then(p => res.redirect('/'));
     
 }
 
