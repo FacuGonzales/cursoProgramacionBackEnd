@@ -15,7 +15,7 @@ function getById(req, res){
 function getAll(req, res){
     // Render me permite dibujar los resultados el la vista
     const prods =  _productos.getAll();
-    res.render("vista", {
+    res.render("pages/listado", {
         productos: prods,
         hayProductos: prods.length
     });
