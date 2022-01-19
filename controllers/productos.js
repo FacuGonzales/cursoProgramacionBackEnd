@@ -13,23 +13,71 @@ function getById(req, res){
 }
 
 function getAll(req, res){
+
+    
+    // _productos.getAll().then(response=>{
+    //     let empty
+    //     response === [] ? empty = true : empty = false
+        
+    //     res.render("index",{
+    //         products:response,
+    //         empty: empty
+    //     })
+    // })
+
+    // products.index()
+    // .then(response=>{
+    //     let empty
+    //     response === [] ? empty = true : empty = false
+        
+    //     res.render("index",{
+    //         products:response,
+    //         empty: empty
+    //     })
+    // })
+
+    
+
+
+
+
+
+
+
     // Render me permite dibujar los resultados el la vista
     const prods =  _productos.getAll();
-    res.render("pages/listado", {
+    let empty
+    prods === [] ? empty = true : empty = false
+    console.log(prods)
+        
+    res.render("index", {
         productos: prods,
-        hayProductos: prods.length
+        // hayProductos: prods.length
+        empty: empty
     });
     // res.send(_listadoProductos);
 }
 
 function save(req, res){
-    const { title, price, thumbnail } = req.body
-    const producto = { title, price, thumbnail }
-    console.log(producto)
-    // _productos.save(producto).then(p => res.send(p))
 
-    // Con redirect me permite al crear el producto volver al formulario.
-    _productos.save(producto).then(p => res.redirect('/'));
+    const { title, price, thumbnail } = req.body
+    let data = { title, price, thumbnail }
+
+    _productos.save(data)
+    .then(response => {
+        // res.send(response)
+        res.redirect("/api/productos")
+        SOCKET.sockets.emit("addedProduct",data)
+    })
+
+
+    // const { title, price, thumbnail } = req.body
+    // const producto = { title, price, thumbnail }
+    // console.log(producto)
+    // // _productos.save(producto).then(p => res.send(p))
+
+    // // Con redirect me permite al crear el producto volver al formulario.
+    // _productos.save(producto).then(p => res.redirect('/'));
     
 }
 

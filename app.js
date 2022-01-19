@@ -1,6 +1,6 @@
 const EXPRESS = require('express');
 const app = EXPRESS();
-// const handlebars = require('express-handlebars')
+const engine = require('express-handlebars')
 
 // Importaciones a express
 const PATH = require('path')
@@ -9,48 +9,45 @@ const SOCKET = require('socket.io')(SERVER)
 
 const ProductRoutes = require('./routes/productos');
 
-const mensajes = []
+let messages = []
 
-//-------------- UTILIZANDO HANDLEBARS ------------------------------
-// app.engine(
-//     "hbs",
-//     handlebars({
-//         extname: ".hbs",
-//         defaultLayout: 'index.hbs',
-//     })
-// );
-// app.set("view engine", "hbs");
-// app.set("views", "./views/hbs-templates");
+app.engine("hbs",
+engine({
+    extname: ".hbs",
+    defaultLayout: "index.hbs",
+    layoutsDir: "./views/layouts",
+    partialsDir:  "./views/partials"
+    })
+)
 
-//-------------- UTILIZANDO PUG ------------------------------
-// app.set('views', './views/pug-template');
-// app.set('view engine', 'pug');
+app.set("view engine", "hbs")
+app.set("views", "./views")
 
-//-------------- UTILIZANDO EJS ------------------------------
-// app.set('views', './views/ejs-templates');
-// app.set('view engine', 'ejs');
-
-app.set("view engine", "ejs");
-app.set("views", "./views");
 
 app.use(EXPRESS.json());
 app.use(EXPRESS.urlencoded({extended: false}));
-app.use(EXPRESS.static(PATH.join(__dirname, 'public')));
+app.use(EXPRESS.static('public'));
 
-// SOCKET
-SOCKET.on('connection', socket => {
-    console.log('Nuevo cliente conectado!');
-    
-    /* Envio los mensajes al cliente que se conectó */
-    socket.emit('mensajes', mensajes);
-    
-    /* Escucho los mensajes enviado por el cliente y se los propago a todos */
-    socket.on('mensaje', data => {
-        mensajes.push({socketid: socket.id, mensaje: data})
-        SOCKET.sockets.emit('mensajes', mensajes); 
-    });  
-});
+//Websockets
 
+SOCKET.on("connection", (socket)=>{
+    console.log("user connected. ID:",socket.id)
+    socket.emit("message", "connected to websocket")
+    products.index()
+    .then(response =>{
+        socket.emit("products", response)
+    })
+    socket.emit("chat", messages)
+
+    socket.on("sendMessage", data =>{
+        messages.push(data)
+        SOCKET.sockets.emit("newMessage",data)
+    })
+    
+    socket.on("receivedMessage", data =>{
+        
+    })
+})
 
 
 

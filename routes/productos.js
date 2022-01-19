@@ -1,4 +1,8 @@
 const EXPRESS = require('express');
+// const app = EXPRESS();
+// const SERVER = require('http').Server(app)
+// const SOCKET = require('socket.io')(SERVER)
+
 const ProductosContoller = require('../controllers/productos');
 
 const api = EXPRESS.Router();
@@ -12,19 +16,22 @@ const api = EXPRESS.Router();
 
 
 api.get('/', (req, res) => {
-    res.render('pages/index')
+    res.render("main",{
+        url: "/api/cargarProductos",
+        method: "post",
+        button: "Create product"
+    })
 })
 
 api.post('/cargarProductos', ProductosContoller.save);
-// api.post('/productos', async (req, res) => {
-//     await productos.save(req.body)
-//     res.redirect('/')
-// })
 
 api.get('/productos', ProductosContoller.getAll);
 // router.get('/productos', async (req, res) =>{
 //     const db = await productos.getAll()
 //     res.render('pages/listado', {productos: db})
 // })
+
+// api.use(EXPRESS.json())
+// api.use(EXPRESS.urlencoded({extended : true}))
 
 module.exports = api;
